@@ -6,21 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserDetailsServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -37,28 +32,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .credentialsExpired(!user.isCredentialsNonExpired())
                 .disabled(!user.isEnabled())
                 .build();
-    }
-
-    public User createUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
-
-    public Optional<User> updateUser(Long id, User userDetails) {
-        return userRepository.findById(id)
-                .map(existingUser -> {
-                    existingUser.setName(userDetails.getName());
-                    existingUser.setEmail(userDetails.getEmail());
-                    existingUser.setUsername(userDetails.getUsername());
-                    if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
-                        existingUser.setPassword(passwordEncoder.encode(userDetails.getPassword()));
-                    }
-                    existingUser.setRoles(userDetails.getRoles());
-                    existingUser.setAccountNonExpired(userDetails.isAccountNonExpired());
-                    existingUser.setAccountNonLocked(userDetails.isAccountNonLocked());
-                    existingUser.setCredentialsNonExpired(userDetails.isCredentialsNonExpired());
-                    existingUser.setEnabled(userDetails.isEnabled());
-                    return userRepository.save(existingUser);
-                });
     }
 }
