@@ -2,6 +2,7 @@ package com.facialanalyse.facialAPI.model;
 
 
 import jakarta.persistence.*;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +43,13 @@ public class User {
     public User(){
 
     }
-    // Constructeur avec paramètres
+
+    // Constructeur Partiel
+    public User(Long id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
 
     public User(Long id, String name, String email, Set<Expression> expressions, String username, String password, Set<String> roles, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled) {
         this.id = id;
@@ -56,13 +63,6 @@ public class User {
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
         this.enabled = enabled;
-    }
-    // Constructeur partiel
-
-    public User(Long id, String name, String email) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
     }
 
 
