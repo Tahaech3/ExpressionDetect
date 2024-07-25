@@ -1,47 +1,27 @@
 package com.facialanalyse.facialAPI.controller;
 
-import com.facialanalyse.facialAPI.model.LoginRequest;
-import com.facialanalyse.facialAPI.model.LoginResponse;
-import com.facialanalyse.facialAPI.service.AuthenticationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthenticationController {
 
-    private final AuthenticationService authenticationService;
-
-    @Autowired
-    public AuthenticationController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
+    @GetMapping("/welcome")
+    public String welcome(){
+        return "Welcome to the public endpoint";
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        LoginResponse response = authenticationService.login(loginRequest);
-        return ResponseEntity.ok(response);
+    @GetMapping("/user/userProfile")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+    public String userProfile() {
+        return "Welcome to User Profile";
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        authenticationService.logout();
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/public/test")
-    public ResponseEntity<String> publicEndpoint() {
-        return ResponseEntity.ok("This is a public endpoint");
-    }
-
-    @GetMapping("/user/test")
-    public ResponseEntity<String> userEndpoint() {
-        return ResponseEntity.ok("This is a user endpoint");
-    }
-
-    @GetMapping("/admin/test")
-    public ResponseEntity<String> adminEndpoint() {
-        return ResponseEntity.ok("This is an admin endpoint");
+    @GetMapping("/admin/adminProfile")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public String adminProfile() {
+        return "Welcome to Admin Profile";
     }
 }
