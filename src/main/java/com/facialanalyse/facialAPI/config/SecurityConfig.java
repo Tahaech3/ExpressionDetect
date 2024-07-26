@@ -24,12 +24,15 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-
+    @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
         //InMemoryUserDetailsManager
         UserDetails admin = User.withUsername("admin").password(encoder.encode("123")).roles("ADMIN","USER").build();
 
         UserDetails user = User.withUsername("user").password(encoder.encode("123")).roles("USER").build();
+
+        System.out.println("Admin password: " + encoder.encode("123"));
+        System.out.println("User password: " + encoder.encode("123"));
         return new InMemoryUserDetailsManager(admin,user);
     }
 
@@ -39,12 +42,23 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/auth/welcome").permitAll()
+                .requestMatchers("/auth/welcome",
+                        "/v2/api-docs",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-resources",
+                        "/swagger-resources/**",
+                        "/configuration/ui",
+                        "/configuration/security",
+                        "/swagger-ui/**",
+                        "/webjars/**",
+                        "/swagger-ui.html").permitAll()
                 .and()
                 .authorizeHttpRequests().requestMatchers("/auth/user/**").authenticated()
                 .and()
                 .authorizeHttpRequests().requestMatchers("/auth/admin/**").authenticated()
                 .requestMatchers("/api/products/**").hasRole("USER")
+
                 .requestMatchers("/api/expressions/**").hasRole("USER")
                 .requestMatchers("/api/recommendations/**").hasRole("USER")
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
